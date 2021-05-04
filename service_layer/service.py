@@ -39,7 +39,7 @@ def add_shipment(
 
 
 def update_shipment(
-    validated_data: UpdateShipment 
+    validated_data: UpdateShipment
 ) -> None:
     shipment = handlers.update_shipment(command.UpdateShipment(
         item=validated_data.item,
@@ -113,7 +113,7 @@ def add_sku(
 
 
 def add_batch(
-    validated_data: AddBatch  # call commmand.py
+    validated_data: AddBatch  # call abstract.py
 ) -> None:
     batch = handlers.add_batch(command.AddBatch(
         sku=validated_data.sku,
@@ -127,7 +127,7 @@ def add_batch(
 
 
 def add_orde_line(
-    validated_data: AddOrderLine  # call command.py
+    validated_data: AddOrderLine  # call abstract.py
 ) -> None:
     order_line = handlers.add_order_line(command.AddOrderLine(
         sku=validated_data.sku,
@@ -136,111 +136,3 @@ def add_orde_line(
     ))  # call handlers.py
     repo = OrderLineRepository  # call repository.py
     repo.add_order_line(order_line)  # add repository method eg add_order_line
-
-
-def update_batch(
-    id_: uuid4,
-    sku: str,
-    batch_ref: str,
-    quantity: int,
-    manufacture_date: date,
-    expire_date: date,
-    repo: BatchRepository
-) -> None:
-    repo.update(model.Batch(id_, sku, batch_ref, quantity, manufacture_date,
-                            expire_date))
-    model.commit()
-
-
-def allocate(
-    order_id: str, sku: str, quantity: int, repo: OrderLineRepository,  # session
-) -> str:
-    line = OrderLine(order_id, sku, quantity)
-    batches = repo.list()
-    if not is_valid_sku(line.sku, batches):
-        raise InvalidSku("Invalid sku {line.sku}")
-    batch_ref = model.allocate(line, batches)
-    model.commit()  # session.commit()
-    return batch_ref
-
-
-class InvalidOrder(Exception):
-    pass
-
-
-def is_valid_order(item, orders):
-    retu item in {b.item for b in orders}
-
-
-def add_order(
-    order_id: UUID,
-    customer_id: UUID,
-    item: str,
-    amount: float,
-    quantity: int,
-    shipperId: UUID,
-    shipping_address: str,
-    order_address: str,
-    order_email: email,
-    order_date: date,
-    order_status: bool,
-    timestamp: ,
-    paymentDate: datetime,
-    payementId: UUID,
-    paid: bool,
-    repo: OrderRepository,
-    # session,
-) -> None:
-    repo.add(model.Order(order_id, customer_id, item, amount, quantity, shipperId,
-                         shipping_address, order_address, order_email, order_date, order_status,
-                         timestamp, paymentDate, payementId, paid))
-    model.commit()  # session.commit()
-
-
-def update_order(
-    order_id: UUID,
-    customer_id: UUID,
-    item: str,
-    amount: float,
-    quantity: int,
-    shipperId: UUID,
-    shipping_address: str,
-    order_address: str,
-    order_email: email,
-    order_date: date,
-    order_status: bool,
-    timestamp: ,
-    paymentDate: datetime,
-    payementId: UUID,
-    paid: bool,
-    repo: OrderRepository,
-
-) -> None:
-    repo.update(model.Order(order_id, customer_id, item, amount, quantity, shipperId,
-                            shipping_address, order_address, order_email, order_date, order_status,
-                            timestamp, paymentDate, payementId, paid))
-    model.commit()
-
-
-def allocate_order(
-    id_: UUID,
-    order_id: UUID,
-    product_id: str,
-    sku_id: str,
-    price: float,
-    quantity: int,
-    tax: float,
-    discount: float,
-    total: float,
-    shipdate: date,
-    billdate: datetime,
-    repo: OrderdDetailRepository,
-) -> str:
-    order_detail = OrderDetail(order_id, product_id, sku_id, price,
-                               quantity, tax, discount, total, shipdate, billdate)
-    orders = repo.list()
-    if not is_valid_order(order_detail.order_id, orders):
-        raise InvalidOrder("Invalid order (order_detail.order_id}")
-    order_id = model.allocate_order(order_detail, orders)
-    model.commit()
-    return order_id
