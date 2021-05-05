@@ -91,14 +91,11 @@ class Order(BaseModel):
     def update(self, mapping: typing.Dict[str, typing.Any]) -> Order:
         return self.copy(update=mapping)
 
-    def add_order(self, channel: ChannelReference) -> User:
-        channels = set(self.channels)
-        channels.add(channel)
-        return self.copy(update={"channels": tuple[ChannelReference]})
+    def add_order(self, order: OrderReference) -> Order:
+        orders = set(self.orders)
+        orders.add(order)
+        return self.copy(update={"orders": tuple(orders)]})
 
-    def add_channels(self, channels: typing.Tuple[ChannelReference]) -> User:
-        _channels = set(self.channels) | channels
-        return self.copy(update={"channnels": tuple(_channels)})
 
 def order_factory(
      id_: UUID,
@@ -184,10 +181,7 @@ def order_detail_factory(
         shipdate=shipdate,
         billdate=billdate,
     )
-
-            
-
-    
+ 
 
 class Sku(BaseModel):
     """
@@ -207,12 +201,6 @@ class Sku(BaseModel):
 
     def update(self, mapping: typing.Dict[str, typing.Any]) -> Sku:
         return self.copy(update=mapping)
-
-    @validator('sku_id')
-    def check_sku_id_not_empty(cls, v):
-        for skuid in v:
-            assert skuid != '', 'Empty strings are not allowed.'
-        return v
 
 
 def sku_factory(
@@ -253,14 +241,6 @@ class Batch(BaseModel):
 
     def update(self, mapping: typing.Dict[str, typing.Any]) -> Batch:
         return self.copy(update=mapping)
-
-    @validator("manufacture_date")
-    def manufacture_within_three_years(cls, manufacture_date):
-        if not abs(time_in_delta.days) <= 3*365:
-            raise ValueError(
-                "must be manufacture not exceeding three years from now")
-        return manufacture_date
-
     
 
 def batch_factory(
@@ -281,7 +261,6 @@ def batch_factory(
      )
 
    
-
 
 class OrderLine(BaseModel):
     """

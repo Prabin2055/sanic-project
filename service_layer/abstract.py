@@ -14,17 +14,6 @@ class AddShipment(BaseModel):
     batch_ref: str
 
 
-class UpdateShipment(BaseModel):
-    item: str,
-    quantity: int,
-    purchase_date: date,
-    received_date: date,
-    address: str,
-    contact: str,
-    sku_id: str,
-    batch_ref: str
-
-
 class AddOrder(BaseModel):
     order_id: uuid4,
     customer_id: uuid4,
@@ -75,3 +64,11 @@ class AddOrderLine(BaseModel):
     sku: str,
     quatity: int,
     order_id: str
+
+
+class BatchAbstact(BaseModel):
+    batch = Batch
+
+
+class UpdateBatchQuantity(BatchAbstact):
+    quantity: int

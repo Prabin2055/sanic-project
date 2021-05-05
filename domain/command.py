@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-import model
+from source.domain.model import Batch, Shipment, Order, Sku
 
 
 class AddShipment(BaseModel):
@@ -14,15 +14,16 @@ class AddShipment(BaseModel):
     batch_ref: str
 
 
-class UpdateShipment(BaseModel):
-    item: str,
-    quantity: int,
-    purchase_date: date,
-    received_date: date,
-    address: str,
-    contact: str,
-    sku_id: str,
+class ShipmentCommand(BaseModel):
+    shipment = Shipment
+
+
+class UpdateShipmentBatch(ShipmentCommand):
     batch_ref: str
+
+
+class UpdateShipmentQuantity(ShipmentCommand):
+    quantity: int
 
 
 class AddOrder(BaseModel):
@@ -69,6 +70,17 @@ class AddBatch(BaseModel):
     qunatity: int,
     manufactire_date: date,
     expire_date: date
+
+
+class BatchCommand(BaseModel):
+    batch = Batch
+
+
+class UpdateBatchQuantity(BatchCommand):
+    quantity: int
+
+# class UpdateSku(BatchCommand):
+#     sku:
 
 
 class AddOrderLine(BaseModel):
