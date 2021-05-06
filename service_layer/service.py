@@ -14,8 +14,9 @@ from source.service_layer.abstract import AddBatch, AddOrder, AddSku, AddShipmen
 from __future__ import annotations
 from typing import Optional
 from datetime import date
+from uuid import UUID
 from source.domain import model
-from source.domain.model import OrderLine, Order, OrderDetail
+from source.domain.model import OrderLine, Order, OrderDetail, Sku, Shipment, Batch
 from source.adapters.repository import BatchRepository, OrderRepository, OrderdDetailRepository, OrderLineRepository, SkuRepository, ShipmentRepository
 # from handlers import add_shipment, add_order, add_order_detail, add_sku, add_batch, add_orderline
 
@@ -35,7 +36,7 @@ def add_shipment(
 
     ))
     repo = ShipmentRepository()
-    repo.add_shipment(shipment)
+    repo.add(shipment)
 
 
 def update_shipment_batch(id_: UUID, validated_data: abstract.UpdateShipmentBatch):
@@ -54,6 +55,10 @@ def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQ
         model=Shipment, quantity=validated_data.quantity
     ))
     repo.update(shipment)
+# def delete_shipment(id_:UUID, validated_data.abstract.ShipmentAbstract):
+#     repo = ShipmentRepository()
+#     shipment = repo.get(id_)
+#     del shipment
 
 
 def add_order(
@@ -76,8 +81,35 @@ def add_order(
         payementId=validated_data.payementId,
         paid=validated_data.paid
     ))
-    repo = OrderRepository
-    repo.add_order(order)
+    repo = OrderRepository()
+    repo.add(order)
+
+
+def update_order_item(id_: UUID, validated_data: abstract.UpdateOrderItem):
+    repo = OrderRepository()
+    order = repo.get(id_)
+    order = handlers.update_order(command.UpdateOrderItem(
+        model=Order, item=validated_data.item
+    ))
+    repo.update(order)
+
+
+def update_order_quantity(id_: UUID, validated_data: abstract.UpdateOrderQuantity):
+    repo = OrderRepository()
+    order = repo.get(id_)
+    order = handlers.update_order(command.UpdateOrderQuantity(
+        model=Order, quantity=validated_data.quantity
+    ))
+    repo.update(order)
+
+
+def update_order_amount(id_: UUID, validated_data: abstract.UpdateOrderAmount):
+    repo = OrderRepository()
+    order = repo.get(id_)
+    order = handlers.update_order(command.UpdateOrderAmount(
+        model=Order, amount=validated_data.amount
+    ))
+    repo.update(order)
 
 
 def add_orderdetail(
@@ -95,8 +127,17 @@ def add_orderdetail(
         shipdate=validated_data.shipdate,
         billdate=validated_data.billdate
     ))
-    repo = OrderdDetailRepository
-    repo.add_order_detail(order_detail)
+    repo = OrderdDetailRepository()
+    repo.add(order_detail)
+
+
+def update_order_detail(id_: UUID, validated_data: abstract.OrderDetailCommand):
+    repo = OrderdDetailRepository()
+    order_detail = repo.get(id_)
+    order_detail = handlers.update_order_detail(command.UpdateOrderDetailQuantity(
+        model=OrderDetail, quantity=validated_data.quantity
+    ))
+    repo.update(order_detail)
 
 
 def add_sku(
@@ -108,12 +149,21 @@ def add_sku(
         color=validated_data.color,
         product=validated_data.product
     ))
-    repo = SkuRepository
-    repo.add_sku(sku)
+    repo = SkuRepository()
+    repo.add(sku)
+
+
+def update_sku(id_: UUID, validated_data: abstract.UpdateSkuProduct):
+    repo = SkuRepository()
+    sku = repo.get(id_)
+    sku = handlers.update_sku(command.UpdateSkuProduct(
+        model=Sku, product=validated_data.product
+    ))
+    repo.update(sku)
 
 
 def add_batch(
-    validated_data: AddBatch  # call abstract.py
+    validated_data: AddBatch  # from call abstract.py
 ) -> None:
     batch = handlers.add_batch(command.AddBatch(
         sku=validated_data.sku,
@@ -126,7 +176,7 @@ def add_batch(
     repo.add(batch)
 
 
-def update_batch_quantity(id_: uuid, validated_data: abstract.UpdateBatchQuantity):
+def update_batch_quantity(id_: UUID, validated_data: abstract.UpdateBatchQuantity):
     repo = BatchRepository()  # store 10 batch -> 4batch
     batch = repo.get(id_)
     batch = handlers.update_batch(command.UpdateBatchQuantity(
@@ -135,13 +185,13 @@ def update_batch_quantity(id_: uuid, validated_data: abstract.UpdateBatchQuantit
     repo.update(batch)
 
 
-def add_orde_line(
-    validated_data: AddOrderLine  # call abstract.py
+def add_order_line(
+    validated_data: AddOrderLine  # from call abstract.py
 ) -> None:
     order_line = handlers.add_order_line(command.AddOrderLine(
         sku=validated_data.sku,
         quantity=validated_data.quantity,
         order_id=validated_data.order_id
     ))  # call handlers.py
-    repo = OrderLineRepository  # call repository.py
-    repo.add_order_line(order_line)  # add repository method eg add_order_line
+    repo = OrderLineRepository()  # call repository.py
+    repo.add(order_line)  # add repository method eg add

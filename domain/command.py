@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from source.domain.model import Batch, Shipment, Order, Sku
+from source.domain.model import Batch, Shipment, Order, Sku, OrderDetail
 
 
 class AddShipment(BaseModel):
@@ -44,6 +44,22 @@ class AddOrder(BaseModel):
     paid: bool
 
 
+class OrderCommand(BaseModel):
+    order = Order
+
+
+class UpdateOrderItem(OrderCommand):
+    item = str
+
+
+class UpdateOrderAmount(OrderCommand):
+    amount: float
+
+
+class UpdateOrderQuantity(OrderCommand):
+    quantity: str
+
+
 class AddOrderDetail(BaseModel):
     order_id: UUID,
     product_id: str,
@@ -57,10 +73,26 @@ class AddOrderDetail(BaseModel):
     billdate: datetime
 
 
+class OrderDetailCommand(BaseModel):
+    order_detail = OrderDetail
+
+
+class UpdateOrderDetailQuantity(OrderDetailCommand):
+    quantity: int
+
+
 class AddSku(BaseModel):
     brand: str,
     size: str,
     color: Color,
+    product: str
+
+
+class SkuCommand(BaseModel):
+    sku = Sku
+
+
+class UpdateSkuProduct(SkuCommand):
     product: str
 
 

@@ -30,6 +30,8 @@ async def update_shipment(cmd: command.ShipmentCommand) -> model.Shipment:
             'quantity': cmd.quantity
         })
 
+# async def delete_shipment(cmd:command.DeleteOrder)->model.Shipment:
+
 
 async def add_order(cmd: AddOrder) -> model.Order:
     return model.order_factory(
@@ -50,6 +52,21 @@ async def add_order(cmd: AddOrder) -> model.Order:
     )
 
 
+async def update_order(cmd: command.OrderCommand) -> model.Order:
+    if isinstance(cmd, command.UpdateOrderItem):
+        return cmd.order.update({
+            'item': cmd.item
+        })
+    elif isinstance(cmd, command.UpdateOrderQuantity):
+        return cmd.order.update({
+            'quantity': cmd.quantity
+        })
+    elif isinstance(cmd, command.UpdateOrderAmount):
+        return cmd.order.update({
+            'amount': cmd.amount
+        })
+
+
 async def add_order_detail(cmd: AddOrderDetail) -> model.OrderDetail:
     return model.order_detail_factory(
         order_id=cmd.order_id,
@@ -65,6 +82,13 @@ async def add_order_detail(cmd: AddOrderDetail) -> model.OrderDetail:
     )
 
 
+async def update_order_detail(cmd: command.OrderDetailCommand) -> model.OrderDetail:
+    if isinstance(cmd, command.UpdateOrderDetailQuantity):
+        return cmd.order_detail.update({
+            'quantity': cmd.quantity
+        })
+
+
 async def add_sku(cmd: AddSku) -> model.Sku:
     return Model.sku_factory(
         sku_id=cmd.sku_id,
@@ -73,6 +97,13 @@ async def add_sku(cmd: AddSku) -> model.Sku:
         color=cmd.color,
         product=cmd.product
     )
+
+
+async def update_sku(cmd: command.SkuCommand) -> model.Sku:
+    if isinstance(cmd, command.UpdateSkuProduct):
+        return cmd.sku.update({
+            'product': cmd.product
+        })
 
 
 async def add_batch(cmd: AddBatch) -> model.Batch:
@@ -90,14 +121,11 @@ async def update_batch(cmd: BatchCommand) -> model.Batch:
         return cmd.batch.update({
             'quantity': cmd.quantity
         })
-    # elif isinstance(cmd, UpdateSku):
-    #     return cmd.batch.update({
-    #         'sku': cmd.sku
-    #     })
 
 
 
-async def add_orderline(cmd: AddOrderLine) -> model.OrderLine:
+
+async def add_order_line(cmd: AddOrderLine) -> model.OrderLine:
     return model.orderline_factory(
         sku = cmd.sku,
         quantity = cmd.quantity,

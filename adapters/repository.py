@@ -55,8 +55,41 @@ class ShipmentRepository:
         }
         await model.append(values)
 
+    async def update(self, model: Shipment) -> None:
+          values = {
+            "id_": model.Id_,
+            "item": model.item,
+            "quantity": model.quantity,
+            "purchase_date": model.purchase_date,
+            "received_date": model.received_date,
+            "address": model.address,
+            "contact": model.contact,
+            "sku_id": model.sku_id,
+            "batch_ref": model.batch_ref,
 
-batch
+        }
+
+        for i in range(len(self)+1):
+            if self[i]["id_"] == values.id_:
+                await self[i].update(values)
+
+    async def get(self, id_: uuid4) -> Shipment:
+        shipment = {}
+        if id_ in shipment_list[id_]:
+            shipment = shipment_list[id_]
+        return OrderDetail.construct(shipment)
+
+    async def delete(self, model: Shipment) -> None:
+        if self.id_ in model.id_:
+            del model[id_]
+
+
+class OrderRepository:
+    async def add(self, model:Order):
+        values = {
+            "order_id": model.order_id,
+            "customer_id": model.customer_id,
+            "item": model.item,
             "amount": model.amount,
             "quantity": model.quantity,
             "shipperId": model.shipperId,
@@ -69,6 +102,27 @@ batch
             "paymentDate": model.paymentDate,
             "payementId": model.payementId,
             "paid": model.paid,
+        }
+        await model.append(values)
+
+    async def update(self, model:Order)->None:
+        vlaues = {
+            "order_id": model.order_id,
+            "customer_id": model.customer_id,
+            "item": model.item,
+            "amount": model.amount,
+            "quantity": model.quantity,
+            "shipperId": model.shipperId,
+            "shipping_address": model.shipping_address,
+            "order_address": model.order_address,
+            "order_email": model.order_email,
+            "order_date": model.order_date,
+            "order_status": model.order_status,
+            "timestamp": model.timestamp,
+            "paymentDate": model.paymentDate,
+            "payementId": model.payementId,
+            "paid": model.paid
+
         }
         for i in range(len(self)+1):
             if self[i]["id_"] == values.id_:
