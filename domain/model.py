@@ -38,7 +38,7 @@ class Shipment(BaseModel):
         extra = "forbid"  # forbid extra attributes during model initialization
         title = 'Shipment'
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> Shipment:
+    def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
 
 
@@ -88,10 +88,10 @@ class Order(BaseModel):
         extra = "forbid"
         title = "Order"
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> Order:
+    def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
 
-    def add_order(self, order: OrderReference) -> Order:
+    def add_order(self, order: OrderReference):
         orders = set(self.orders)
         orders.add(order)
         return self.copy(update={"orders": tuple(orders)]})
@@ -152,7 +152,7 @@ class OrderDetail(BaseModel):
         extra = 'forbid' 
         title='OrderDetail'
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> OrderDetail:
+    def update(self, mapping:Dict[str, Any]):
         return self.copy(update=mapping)
 
 def order_detail_factory(
@@ -199,7 +199,7 @@ class Sku(BaseModel):
         title="Sku"
 
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> Sku:
+    def update(self, mapping:Dict[str, Any]):
         return self.copy(update=mapping)
 
 
@@ -239,7 +239,7 @@ class Batch(BaseModel):
         extra = 'forbid'
         title="Batch"
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> Batch:
+    def update(self, mapping:Dict[str, Any]):
         return self.copy(update=mapping)
     
 
@@ -281,7 +281,7 @@ class OrderLine(BaseModel):
         extra = "forbid"
         title="OrderLine"
 
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> OrderLine:
+    def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
 
 def orderline_factory(

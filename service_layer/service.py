@@ -8,6 +8,7 @@ W2.e make some checks or assertions about the request against the current state 
 3.We call a domain service.
 
 4.If all is well, we save/update any state we’ve changed.
+
 """
 
 from source.service_layer.abstract import AddBatch, AddOrder, AddSku, AddShipment, AddOrderDetail, AddOrderLine, UpdateShipment
@@ -55,10 +56,11 @@ def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQ
         model=Shipment, quantity=validated_data.quantity
     ))
     repo.update(shipment)
+
 # def delete_shipment(id_:UUID, validated_data.abstract.ShipmentAbstract):
 #     repo = ShipmentRepository()
 #     shipment = repo.get(id_)
-#     del shipment
+#
 
 
 def add_order(

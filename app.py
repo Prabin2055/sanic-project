@@ -36,6 +36,19 @@ batch_list = [{
     'expire_date': "2040-01-01T00:00"
 }]
 
+shipment_list = [{
+    # insert shipment value
+
+}]
+order_list = [{
+    # insert order value manually
+
+}]
+order_detail_list = [{
+    # insert order_detail manually
+
+}]
+
 
 @app.get("/")
 async def hello_world(request):
@@ -57,7 +70,7 @@ async def get_batches(request):
     return json(new_batch)
 
 
-@app.get("/batch/<id:int" > )
+@app.get("/batch/<id:int" >)
 async def get_batches_by_id(request, id: int):
     for i in range(len(batch_list)+1):
         try:

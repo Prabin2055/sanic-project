@@ -40,6 +40,12 @@ from .app import sku_list, batch_list
 
 
 class ShipmentRepository:
+    async def get(self, id_: uuid4) -> Shipment:
+        shipment = {}
+        if id_ in shipment_list[id_]:
+            shipment = shipment_list[id_]
+        return OrderDetail.construct(shipment)
+
     async def add(self, model: Shipment):
         values = {
             "id_": model.Id_,
@@ -68,16 +74,9 @@ class ShipmentRepository:
             "batch_ref": model.batch_ref,
 
         }
-
         for i in range(len(self)+1):
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
-
-    async def get(self, id_: uuid4) -> Shipment:
-        shipment = {}
-        if id_ in shipment_list[id_]:
-            shipment = shipment_list[id_]
-        return OrderDetail.construct(shipment)
 
     async def delete(self, model: Shipment) -> None:
         if self.id_ in model.id_:
@@ -85,6 +84,13 @@ class ShipmentRepository:
 
 
 class OrderRepository:
+    async def get(self, id_: uuid4) -> Order:
+        order = {}
+        if id_ in order_list[id_]:
+            order = order_list[id_]
+        return Order.construct(order)
+
+
     async def add(self, model:Order):
         values = {
             "order_id": model.order_id,
@@ -128,12 +134,6 @@ class OrderRepository:
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
 
-    async def get(self, id_: uuid4) -> Order:
-        order = {}
-        if id_ in order_list[id_]:
-            order = order_list[id_]
-        return Order.construct(order)
-
     # async def get(self, customer_id) -> Dict:
     #     return self.query(models.Order).filter_by(customer_id=customer_id).one()
 
@@ -143,6 +143,13 @@ class OrderRepository:
 
 
 class OrderdDetailRepository:
+    async def get(self, id_: uuid4) -> OrderDetail:
+        order_detail = {}
+        if id_ in order_detail_list[id_]:
+            order_detail = order_detail_list[id_]
+        return OrderDetail.construct(order_detail)
+
+
     async def add(self, model: OrderDetail):
         values = {
             "id_": model.Id_,
@@ -177,18 +184,19 @@ class OrderdDetailRepository:
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
 
-    async def get(self, id_: uuid4) -> OrderDetail:
-        order_detail = {}
-        if id_ in order_detail_list[id_]:
-            order_detail = order_detail_list[id_]
-        return OrderDetail.construct(order_detail)
-
     async def delete(self, model: OrderDetail) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
 
 class SkuRepository:
+    async def get(self, sku_id) -> Sku:
+        sku = {}
+        if sku_id in sku_list[sku_id]:
+            sku = sku_list[sku_id]
+        return Sku.construct(sku)
+
+
     async def add(self, model: Sku):
         values = {
             "sku_id": model.sku_id,
@@ -209,11 +217,6 @@ class SkuRepository:
         }
         await model.update(values)
 
-    async def get(self, sku_id) -> Sku:
-        sku = {}
-        if sku_id in sku_list[sku_id]:
-            sku = sku_list[sku_id]
-        return Sku.construct(sku)
 
     async def delete(self, model: Sku) -> None:
         if self.sku_id in model.sku_id:
@@ -221,6 +224,13 @@ class SkuRepository:
 
 
 class BatchRepository:
+    async def get(self, batch_ref) -> Batch:
+        batch = {}
+        if batch_ref in batch_list[batch_ref]:
+            batch = batch_list[batch_ref]
+        return Batch.construct(batch)
+
+
     async def add(self, model: Batch):
         values = {
             "id_": model.id_,
@@ -245,11 +255,6 @@ class BatchRepository:
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
 
-    async def get(self, batch_ref) -> Batch:
-        batch = {}
-        if batch_ref in batch_list[batch_ref]:
-            batch = batch_list[batch_ref]
-        return Batch.construct(batch)
 
     async def delete(self, model: Batch) -> None:
         if self.id_ in model.id_:
@@ -259,6 +264,13 @@ class BatchRepository:
 
 
 class OrderLineRepository:
+    async def get(self, id_) -> OrderLine:
+        order_line = {}
+        if id_ in order_line_list[id_]:
+            order_line = order_line_list[id_]
+        return OrderLine.construct(order_line)
+
+
     async def add(self, model: OrderLine):
         values = {
             "id_": model.Id_,
@@ -279,11 +291,6 @@ class OrderLineRepository:
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
 
-    async def get(self, id_) -> OrderLine:
-        order_line = {}
-        if id_ in order_line_list[id_]:
-            order_line = order_line_list[id_]
-        return OrderLine.construct(order_line)
 
     async def delete(self, model: OrderLine) -> None:
         if self.id_ in model.id_:
