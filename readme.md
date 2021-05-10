@@ -29,3 +29,6 @@ https://github.com/Ermlab/python-ddd
 https://awesomeopensource.com/project/valignatev/ddd-dynamic
 
 https://www.pycabook.com/
+
+
+https://github.com/samuelcolvin/pydantic/tree/master/pydantic

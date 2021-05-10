@@ -15,7 +15,7 @@ class AddShipment(BaseModel):
 
 
 class ShipmentCommand(BaseModel):
-    shipment = Shipment
+    shipment: Shipment
 
 
 class UpdateShipmentBatch(ShipmentCommand):
@@ -45,11 +45,11 @@ class AddOrder(BaseModel):
 
 
 class OrderCommand(BaseModel):
-    order = Order
+    order: Order
 
 
 class UpdateOrderItem(OrderCommand):
-    item = str
+    item: str
 
 
 class UpdateOrderAmount(OrderCommand):
@@ -74,7 +74,7 @@ class AddOrderDetail(BaseModel):
 
 
 class OrderDetailCommand(BaseModel):
-    order_detail = OrderDetail
+    order_detail: OrderDetail
 
 
 class UpdateOrderDetailQuantity(OrderDetailCommand):
@@ -89,7 +89,7 @@ class AddSku(BaseModel):
 
 
 class SkuCommand(BaseModel):
-    sku = Sku
+    sku: Sku
 
 
 class UpdateSkuProduct(SkuCommand):
@@ -105,7 +105,7 @@ class AddBatch(BaseModel):
 
 
 class BatchCommand(BaseModel):
-    batch = Batch
+    batch: Batch
 
 
 class UpdateBatchQuantity(BatchCommand):

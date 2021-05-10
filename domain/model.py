@@ -5,6 +5,7 @@ from typing import Optional
 from uuid import UUID
 from pydantic.color import Color
 from pydantic.float import float
+import typing
 """
 1. product is identified bya a sku
 2. customers place order, order  is identified by an order reference
@@ -17,6 +18,20 @@ Notifies about shipment
 Notifies about orders
 Asks for stock levels
 send instructions to warehouse
+
+
+enum field or choices field used below:
+
+from enum import Enum
+from pydantic import BaseModel
+
+class S(str, Enum):
+    am='am'
+    pm='pm'
+
+class K(BaseModel):
+    k:S
+    z:str
 
 """
 
@@ -35,7 +50,7 @@ class Shipment(BaseModel):
     class Config:
         # whether or not models are faux-immutable, i.e. whether __setattr__ is allowed (default: True)
         allow_mutation = False
-        extra = "forbid"  # forbid extra attributes during model initialization
+        extra = "forbid"  # forbid extra attributes during model initialization , avoid extra attribute not here this model class
         title = 'Shipment'
 
     def update(self, mapping: Dict[str, Any]):
@@ -199,10 +214,9 @@ class Sku(BaseModel):
         title="Sku"
 
 
-    def update(self, mapping:Dict[str, Any]):
+    def update(self, mapping:typing.Dict[str, typing.Any])->Sku: #better for use typing . typing is a typecasting eg. int to str
         return self.copy(update=mapping)
-
-
+        
 def sku_factory(
     sku_id: UUID,
     brand: str,

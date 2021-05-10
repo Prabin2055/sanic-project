@@ -84,7 +84,7 @@ class ShipmentRepository:
 
 
 class OrderRepository:
-    async def get(self, id_: uuid4) -> Order:
+    async def get(self, id_: uuid) -> Order:
         order = {}
         if id_ in order_list[id_]:
             order = order_list[id_]
@@ -143,7 +143,7 @@ class OrderRepository:
 
 
 class OrderdDetailRepository:
-    async def get(self, id_: uuid4) -> OrderDetail:
+    async def get(self, id_: UUID) -> OrderDetail:
         order_detail = {}
         if id_ in order_detail_list[id_]:
             order_detail = order_detail_list[id_]
@@ -190,7 +190,7 @@ class OrderdDetailRepository:
 
 
 class SkuRepository:
-    async def get(self, sku_id) -> Sku:
+    async def get(self, sku_id:str) -> Sku:
         sku = {}
         if sku_id in sku_list[sku_id]:
             sku = sku_list[sku_id]
@@ -224,7 +224,7 @@ class SkuRepository:
 
 
 class BatchRepository:
-    async def get(self, batch_ref) -> Batch:
+    async def get(self, batch_ref:str) -> Batch:
         batch = {}
         if batch_ref in batch_list[batch_ref]:
             batch = batch_list[batch_ref]
@@ -264,7 +264,7 @@ class BatchRepository:
 
 
 class OrderLineRepository:
-    async def get(self, id_) -> OrderLine:
+    async def get(self, id_:UUID) -> OrderLine:
         order_line = {}
         if id_ in order_line_list[id_]:
             order_line = order_line_list[id_]

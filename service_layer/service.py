@@ -57,10 +57,11 @@ def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQ
     ))
     repo.update(shipment)
 
-# def delete_shipment(id_:UUID, validated_data.abstract.ShipmentAbstract):
+# def delete_shipment(id_:UUID, validated_data:abstract.ShipmentAbstract):
 #     repo = ShipmentRepository()
 #     shipment = repo.get(id_)
-#
+#     shipment=handlers.delete_shipment(command.ShipmentCommand(validated_data.ShipmentCommand))
+#     repo.delete(shipment)
 
 
 def add_order(
