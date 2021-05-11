@@ -68,17 +68,17 @@ def shipment_factory(
     sku_id: str,
     batch_ref: str,
 ) -> Shipment:
- return Shipment(
-     id_=Id_,
-     item=item,
-     quantity=quantity,
-     purchase_date=purchase_date,
-     received_date=received_date,
-     address=address,
-     contact=contact,
-     sku_id=sku_id,
-     batch_ref=batch_ref,
-)
+    return Shipment(
+        id_=Id_,
+        item=item,
+        quantity=quantity,
+        purchase_date=purchase_date,
+        received_date=received_date,
+        address=address,
+        contact=contact,
+        sku_id=sku_id,
+        batch_ref=batch_ref,
+    )
 
 
 class Order(BaseModel):
@@ -109,26 +109,26 @@ class Order(BaseModel):
     def add_order(self, order: OrderReference):
         orders = set(self.orders)
         orders.add(order)
-        return self.copy(update={"orders": tuple(orders)]})
+        return self.copy(update={"orders": tuple(orders)})
 
 
 def order_factory(
-     id_: UUID,
-     customer_id: UUID,
-     item: str
-     amount: float,
-     quantity: int,
-     shipperId: UUID,
-     shipping_address: str,
-     order_address: str,
-     order_email: email,
-     order_date: date,
-     order_status: bool,
-     timestamp: datetime,
-     paymentDate: datetime,
-     payementId: UUID,
-     paid: bool, 
-     ) -> Order:
+    id_: UUID,
+    customer_id: UUID,
+    item: str,
+    amount: float,
+    quantity: int,
+    shipperId: UUID,
+    shipping_address: str,
+    order_address: str,
+    order_email: email,
+    order_date: date,
+    order_status: bool,
+    timestamp: datetime,
+    paymentDate: datetime,
+    payementId: UUID,
+    paid: bool,
+) -> Order:
     return Order(
         id_=id_,
         customer_id=customer_id,
@@ -144,7 +144,7 @@ def order_factory(
         timestamp=timestamp,
         payementId=payementId,
         paymentDate=paymentDate,
-        paid=paid,
+        paid=paid
 
     )
 
@@ -164,11 +164,12 @@ class OrderDetail(BaseModel):
 
     class Config:
         allow_mutation = False
-        extra = 'forbid' 
-        title='OrderDetail'
+        extra = 'forbid'
+        title = 'OrderDetail'
 
-    def update(self, mapping:Dict[str, Any]):
+    def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
+
 
 def order_detail_factory(
     id_: UUID,
@@ -182,7 +183,7 @@ def order_detail_factory(
     total: float,
     shipdate: date,
     billdate: datetime,
-    ) -> OrderDetail:
+) -> OrderDetail:
     return OrderDetail(
         id_=id_,
         order_id=order_id,
@@ -196,7 +197,7 @@ def order_detail_factory(
         shipdate=shipdate,
         billdate=billdate,
     )
- 
+
 
 class Sku(BaseModel):
     """
@@ -211,20 +212,21 @@ class Sku(BaseModel):
     class Config:
         allow_mutation = False
         extra = "forbid"
-        title="Sku"
+        title = "Sku"
 
-
-    def update(self, mapping:typing.Dict[str, typing.Any])->Sku: #better for use typing . typing is a typecasting eg. int to str
+    # better for use typing . typing is a typecasting eg. int to str
+    def update(self, mapping: typing.Dict[str, typing.Any]) -> Sku:
         return self.copy(update=mapping)
-        
+
+
 def sku_factory(
     sku_id: UUID,
     brand: str,
     size: str,
     color: str,
     product: str,
-    ) -> Sku:
-    return(
+) -> Sku:
+    return Sku(
         sku_id=sku_id,
         brand=brand,
         size=size,
@@ -251,11 +253,11 @@ class Batch(BaseModel):
     class Config:
         allow_mutation = False
         extra = 'forbid'
-        title="Batch"
+        title = "Batch"
 
-    def update(self, mapping:Dict[str, Any]):
+    def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
-    
+
 
 def batch_factory(
     id_: UUID,
@@ -264,7 +266,7 @@ def batch_factory(
     quantity: int,
     manufacture_date: date,
     expire_date: date,
-    ) -> Batch:
+) -> Batch:
     return Batch(
         id_=id_,
         sku=sku,
@@ -272,9 +274,8 @@ def batch_factory(
         quantity=quantity,
         manufacture_date=manufacture_date,
         expire_date=expire_date,
-     )
+    )
 
-   
 
 class OrderLine(BaseModel):
     """
@@ -293,17 +294,18 @@ class OrderLine(BaseModel):
     class Config:
         allow_mutation = False
         extra = "forbid"
-        title="OrderLine"
+        title = "OrderLine"
 
     def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
+
 
 def orderline_factory(
     id_: UUID,
     sku: str,
     quantity: int,
     order_id: UUID,
-    ) -> OrderLine:
+) -> OrderLine:
     return OrderLine(
         id_=id_,
         sku=sku,

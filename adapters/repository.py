@@ -1,4 +1,3 @@
-import model
 import abc
 from source.domain.model import Order, OrderDetail, OrderLine, Sku, Shipment, Batch
 from pydantic.dict import Dict
@@ -31,15 +30,21 @@ from .app import sku_list, batch_list
 #     def list(self):
 #         return self.session.query(models.Batch).all()
 
+class AbstractRepository(abc.ABC):
+    def get(self):
+        raise NotImplementedError
 
-# async def update_values(self: list[Dict], values: Dict):
-#     for i in range(len(model)+1):
-#         if model[i]["id_"] == values.id_:
-#             model[i].update(values)
-#         return model[i]
+    def add(self, model):
+        raise NotImplementedError
+
+    def update(self, model) -> None:
+        raise NotImplementedError
+
+    def delete(self, model) -> None:
+        raise NotImplementedError
 
 
-class ShipmentRepository:
+class ShipmentRepository(AbstractRepository):
     async def get(self, id_: uuid4) -> Shipment:
         shipment = {}
         if id_ in shipment_list[id_]:
@@ -62,7 +67,7 @@ class ShipmentRepository:
         await model.append(values)
 
     async def update(self, model: Shipment) -> None:
-          values = {
+        values = {
             "id_": model.Id_,
             "item": model.item,
             "quantity": model.quantity,
@@ -71,8 +76,7 @@ class ShipmentRepository:
             "address": model.address,
             "contact": model.contact,
             "sku_id": model.sku_id,
-            "batch_ref": model.batch_ref,
-
+            "batch_ref": model.batch_ref
         }
         for i in range(len(self)+1):
             if self[i]["id_"] == values.id_:
@@ -83,15 +87,14 @@ class ShipmentRepository:
             del model[id_]
 
 
-class OrderRepository:
+class OrderRepository(AbstractRepository):
     async def get(self, id_: uuid) -> Order:
         order = {}
         if id_ in order_list[id_]:
             order = order_list[id_]
         return Order.construct(order)
 
-
-    async def add(self, model:Order):
+    async def add(self, model: Order):
         values = {
             "order_id": model.order_id,
             "customer_id": model.customer_id,
@@ -111,7 +114,7 @@ class OrderRepository:
         }
         await model.append(values)
 
-    async def update(self, model:Order)->None:
+    async def update(self, model: Order) -> None:
         vlaues = {
             "order_id": model.order_id,
             "customer_id": model.customer_id,
@@ -137,18 +140,17 @@ class OrderRepository:
     # async def get(self, customer_id) -> Dict:
     #     return self.query(models.Order).filter_by(customer_id=customer_id).one()
 
-    async def delete(self, model: Order) -> None:
+    async def delete(self, model: Shipment) -> None:
         if self.id_ in model.id_:
-            def model[id_]
+            del model[id_]
 
 
-class OrderdDetailRepository:
+class OrderdDetailRepository(AbstractRepository):
     async def get(self, id_: UUID) -> OrderDetail:
         order_detail = {}
         if id_ in order_detail_list[id_]:
             order_detail = order_detail_list[id_]
         return OrderDetail.construct(order_detail)
-
 
     async def add(self, model: OrderDetail):
         values = {
@@ -189,13 +191,12 @@ class OrderdDetailRepository:
             del model[id_]
 
 
-class SkuRepository:
-    async def get(self, sku_id:str) -> Sku:
+class SkuRepository(AbstractRepository):
+    async def get(self, sku_id: str) -> Sku:
         sku = {}
         if sku_id in sku_list[sku_id]:
             sku = sku_list[sku_id]
         return Sku.construct(sku)
-
 
     async def add(self, model: Sku):
         values = {
@@ -217,19 +218,17 @@ class SkuRepository:
         }
         await model.update(values)
 
-
     async def delete(self, model: Sku) -> None:
         if self.sku_id in model.sku_id:
             del model[sku_id]
 
 
-class BatchRepository:
-    async def get(self, batch_ref:str) -> Batch:
+class BatchRepository(AbstractRepository):
+    async def get(self, batch_ref: str) -> Batch:
         batch = {}
         if batch_ref in batch_list[batch_ref]:
             batch = batch_list[batch_ref]
         return Batch.construct(batch)
-
 
     async def add(self, model: Batch):
         values = {
@@ -255,21 +254,17 @@ class BatchRepository:
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
 
-
     async def delete(self, model: Batch) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
-    async
 
-
-class OrderLineRepository:
-    async def get(self, id_:UUID) -> OrderLine:
+class OrderLineRepository(AbstractRepository):
+    async def get(self, id_: UUID) -> OrderLine:
         order_line = {}
         if id_ in order_line_list[id_]:
             order_line = order_line_list[id_]
         return OrderLine.construct(order_line)
-
 
     async def add(self, model: OrderLine):
         values = {
@@ -290,7 +285,6 @@ class OrderLineRepository:
         for i in range(len(self)+1):
             if self[i]["id_"] == values.id_:
                 await self[i].update(values)
-
 
     async def delete(self, model: OrderLine) -> None:
         if self.id_ in model.id_:

@@ -1,16 +1,18 @@
 from pydantic import BaseModel
 from datetime import date
 from source.domain.model import Batch, Shipment, Order, Sku, OrderDetail
+from uuid import UUID
+from datetime import date, datetime
 
 
 class AddShipment(BaseModel):
-    item: str,
-    quantity: int,
-    purchase_date: date,
-    received_date: date,
-    address: str,
-    contact: str,
-    sku_id: str,
+    item: str
+    quantity: int
+    purchase_date: date
+    received_date: date
+    address: str
+    contact: str
+    sku_id: str
     batch_ref: str
 
 
@@ -27,20 +29,20 @@ class UpdateShipmentQuantity(ShipmentCommand):
 
 
 class AddOrder(BaseModel):
-    order_id: UUID,
-    customer_id: UUID,
-    item: str,
-    amount: float,
-    quantity: int,
-    shipperId: UUID,
-    shipping_address: str,
+    order_id: UUID
+    customer_id: UUID
+    item: str
+    amount: float
+    quantity: int
+    shipperId: UUID
+    shipping_address: str
     order_address: str
-    order_email: email,
-    order_date: date,
-    order_status: bool,
-    timestamp: datetime,
-    paymentDate: datetime,
-    payementId: UUID,
+    order_email: email
+    order_date: date
+    order_status: bool
+    timestamp: datetime
+    paymentDate: datetime
+    payementId: UUID
     paid: bool
 
 
@@ -61,15 +63,15 @@ class UpdateOrderQuantity(OrderCommand):
 
 
 class AddOrderDetail(BaseModel):
-    order_id: UUID,
-    product_id: str,
-    sku_id: str,
-    price: float,
-    quantity: int,
-    tax: float,
-    discount: float,
-    total: float,
-    shipdate: date,
+    order_id: UUID
+    product_id: str
+    sku_id: str
+    price: float
+    quantity: int
+    tax: float
+    discount: float
+    total: float
+    shipdate: date
     billdate: datetime
 
 
@@ -82,9 +84,9 @@ class UpdateOrderDetailQuantity(OrderDetailCommand):
 
 
 class AddSku(BaseModel):
-    brand: str,
-    size: str,
-    color: Color,
+    brand: str
+    size: str
+    color: Color
     product: str
 
 
@@ -97,10 +99,10 @@ class UpdateSkuProduct(SkuCommand):
 
 
 class AddBatch(BaseModel):
-    sku: str,
-    batch_ref: str,
-    qunatity: int,
-    manufactire_date: date,
+    sku: str
+    batch_ref: str
+    qunatity: int
+    manufactire_date: date
     expire_date: date
 
 
@@ -116,6 +118,6 @@ class UpdateBatchQuantity(BatchCommand):
 
 
 class AddOrderLine(BaseModel):
-    sku: str,
-    quantity: int,
+    sku: str
+    quantity: int
     order_id: str

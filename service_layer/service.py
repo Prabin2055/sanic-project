@@ -198,3 +198,10 @@ def add_order_line(
     ))  # call handlers.py
     repo = OrderLineRepository()  # call repository.py
     repo.add(order_line)  # add repository method eg add
+
+
+# Add unit_of_work then
+# def add_batch(ref: str, sku: str, qty: int, eta: Optional[date], uow):
+#     with uow:
+#         uow.batches.add(model.Batch(ref, sku, qty, eta)) # batches assign abstractuow:abstractrepo
+#         # uow.commit()

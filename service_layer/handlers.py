@@ -107,7 +107,7 @@ async def update_sku(cmd: command.SkuCommand) -> model.Sku:
 
 
 async def add_batch(cmd: AddBatch) -> model.Batch:
-    return model.batch_factory
+    return model.batch_factory(
         sku = cmd.sku,
         batch_ref = cmd.batch_ref,
         quantity = cmd.quantity,
