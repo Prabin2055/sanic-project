@@ -10,22 +10,24 @@ W2.e make some checks or assertions about the request against the current state 
 4.If all is well, we save/update any state we’ve changed.
 
 """
-
-from source.service_layer.abstract import AddBatch, AddOrder, AddSku, AddShipment, AddOrderDetail, AddOrderLine, UpdateShipment
+from source.service_layer.abstract import AddBatch, AddOrder, AddShipment, AddSku, AddOrderDetail, AddOrderLine, UpdateShipment
 from __future__ import annotations
 from typing import Optional
 from datetime import date
 from uuid import UUID
 from source.domain import model
+from source.service_layer import handlers, unit_of_work
+from source.domain import command
+from source.service_layer import abstract
 from source.domain.model import OrderLine, Order, OrderDetail, Sku, Shipment, Batch
 from source.adapters.repository import BatchRepository, OrderRepository, OrderdDetailRepository, OrderLineRepository, SkuRepository, ShipmentRepository
 # from handlers import add_shipment, add_order, add_order_detail, add_sku, add_batch, add_orderline
 
 
-def add_shipment(
+async def add_shipment(
     validated_data: AddShipment  # call abstract.py
 ) -> None:
-    shipment = handlers.add_shipment(command.AddShipment(
+    shipment = await handlers.add_shipment(command.AddShipment(
         item=validated_data.item,
         quantity=validated_data.quantity,
         purchase_date=validated_data.purchase_date,
@@ -40,11 +42,29 @@ def add_shipment(
     repo.add(shipment)
 
 
+def update_shipment(id_: UUID, validated_data: abstract.UpdateShipment) -> None:
+    repo = ShipmentRepository()
+    shipment = repo.get(id_)
+    shipment = handlers.update_shipment(command.UpdateShipment(
+        shipment=shipment,
+        item=validated_data.item if validated_data.item else shipment.item,
+        quantity=validated_data.quantity if validated_data.quantity else shipment.quantity,
+        purchase_date=validated_data.purchase_date if validated_data.purchase_date else shipment.purchase_date,
+        received_date=validated_data.received_date if validated_data.received_date else shipment.received_date,
+        address=validated_data.address if validated_data.address else shipment.address,
+        contact=validated_data.contact if validated_data.contact else shipment.contact,
+        sku_id=validated_data.sku_id if validated_data.sku_id else shipment.sku_id,
+        batch_ref=validated_data.batch_ref if validated_data.batch_ref else shipment.batch_ref
+
+    ))
+    repo.update(shipment)
+
+
 def update_shipment_batch(id_: UUID, validated_data: abstract.UpdateShipmentBatch):
     repo = ShipmentRepository()
     shipment = repo.get(id_)
     shipment = handlers.update_shipment(command.UpdateShipmentBatch(
-        model=Shipment, batch_ref=validated_data.batch_ref
+        shipment=shipment, batch_ref=validated_data.batch_ref
     ))
     repo.update(shipment)
 
@@ -53,7 +73,7 @@ def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQ
     repo = ShipmentRepository()
     shipment = repo.get(id_)
     shipment = handlers.update_shipment(command.UpdateShipmentQuantity(
-        model=Shipment, quantity=validated_data.quantity
+        shipment=shipment, quantity=validated_data.quantity
     ))
     repo.update(shipment)
 
@@ -92,7 +112,7 @@ def update_order_item(id_: UUID, validated_data: abstract.UpdateOrderItem):
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderItem(
-        model=Order, item=validated_data.item
+        order=order, item=validated_data.item
     ))
     repo.update(order)
 
@@ -101,7 +121,7 @@ def update_order_quantity(id_: UUID, validated_data: abstract.UpdateOrderQuantit
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderQuantity(
-        model=Order, quantity=validated_data.quantity
+        order=order, quantity=validated_data.quantity
     ))
     repo.update(order)
 
@@ -110,7 +130,7 @@ def update_order_amount(id_: UUID, validated_data: abstract.UpdateOrderAmount):
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderAmount(
-        model=Order, amount=validated_data.amount
+        order=order, amount=validated_data.amount
     ))
     repo.update(order)
 
@@ -138,7 +158,7 @@ def update_order_detail(id_: UUID, validated_data: abstract.OrderDetailCommand):
     repo = OrderdDetailRepository()
     order_detail = repo.get(id_)
     order_detail = handlers.update_order_detail(command.UpdateOrderDetailQuantity(
-        model=OrderDetail, quantity=validated_data.quantity
+        order_detail=order_detail, quantity=validated_data.quantity
     ))
     repo.update(order_detail)
 
@@ -160,7 +180,7 @@ def update_sku(id_: UUID, validated_data: abstract.UpdateSkuProduct):
     repo = SkuRepository()
     sku = repo.get(id_)
     sku = handlers.update_sku(command.UpdateSkuProduct(
-        model=Sku, product=validated_data.product
+        sku=sku, product=validated_data.product
     ))
     repo.update(sku)
 
@@ -175,7 +195,7 @@ def add_batch(
         manufacture_date=validated_data.manufacture_date,
         expire_date=validated_data.expire_date
     ))   #
-    repo = BatchRepository()
+    repo = BatchRepository()  # replace batchrepo to batchUow
     repo.add(batch)
 
 
@@ -183,7 +203,7 @@ def update_batch_quantity(id_: UUID, validated_data: abstract.UpdateBatchQuantit
     repo = BatchRepository()  # store 10 batch -> 4batch
     batch = repo.get(id_)
     batch = handlers.update_batch(command.UpdateBatchQuantity(
-        model=Batch, quantity=validated_data.quantity
+        batch=batch, quantity=validated_data.quantity
     ))
     repo.update(batch)
 
@@ -200,8 +220,16 @@ def add_order_line(
     repo.add(order_line)  # add repository method eg add
 
 
-# Add unit_of_work then
-# def add_batch(ref: str, sku: str, qty: int, eta: Optional[date], uow):
-#     with uow:
-#         uow.batches.add(model.Batch(ref, sku, qty, eta)) # batches assign abstractuow:abstractrepo
-#         # uow.commit()
+
+
+
+# unit of work
+
+def add_batch(
+    sku: str, batch_ref: str, quantity: int, manufacture_date: date, expire_date: date,
+    uow: unit_of_work.BatchUnitOfWork
+):
+    with uow:
+        uow.batch_ref.add(model.Batch(
+            sku, batch_ref, quantity, manufacture_date, expire_date))
+        uow.commit()

@@ -16,7 +16,7 @@ from source.adapters import repository
 
 class AbstractUnitOfWork(abc.ABC):
     # which will give us access to the model repository.
-    model: repository.AbstractRepository
+    # model: repository.AbstractRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
@@ -34,11 +34,31 @@ class AbstractUnitOfWork(abc.ABC):
 
 class ShipmentUnitOfWork(AbstractUnitOfWork):
     def __init__(self):
-        self.model = ShipmentRepository([])
+        self.shipment = repository.ShipmentRepository([])
+        self.committed = False
+
+    def __enter__(self) -> ShipmentUnitOfWork:
+        self.shipment = repository.ShipmentRepository()
+        return super().__enter__()
+
+    def __exit__(self, *args):
+        super().__exit__(*args)
+        self.close()
+
+    def commit(self):
+        self.committed = True
+
+    def rollback(self):
+        pass
+
+
+class BatchUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.batch_ref = repository.BatchRepository([])
         self.committed = False
 
     def __enter__(self):
-        self.model = repository.ShipmentRepository()
+        self.batch_ref = repository.BatchRepository()
         return super().__enter__()
 
     def __exit__(self, *args):

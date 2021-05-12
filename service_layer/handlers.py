@@ -1,4 +1,5 @@
-import command
+from source.domain import command
+from source.domain import model
 from source.domain.model import Shipment, Order, OrderDetail, Sku, Batch, OrderLine
 from source.service_layer.commmand import (AddShipment, AddOrder, AddOrderDetail, AddBatch, AddOrderLine, AddSku, UpdateShipment, BatchCommand, UpdateBatchQuantity,
                     ShipmentCommand, UpdateShipmentBatch, UpdateShipmentQuantity)

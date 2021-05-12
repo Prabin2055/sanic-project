@@ -20,6 +20,17 @@ class ShipmentCommand(BaseModel):
     shipment: Shipment
 
 
+class UpdateShipment(ShipmentCommand):
+    item: str
+    quantity: int
+    purchase_date: date
+    received_date: date
+    address: str
+    contact: str
+    sku_id: str
+    batch_ref: str
+
+
 class UpdateShipmentBatch(ShipmentCommand):
     batch_ref: str
 

@@ -19,6 +19,17 @@ class ShipmentAbstract(BaseModel):
     shipment: Shipment
 
 
+class UpdateShipment(ShipmentAbstract):
+    item: str
+    quantity: int
+    purchase_date: date
+    received_date: date
+    address: str
+    contact: str
+    sku_id: str
+    batch_ref: str
+
+
 class UpdateShipmentBatch(ShipmentAbstract):
     batch_ref: str
 

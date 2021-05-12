@@ -1,11 +1,12 @@
 import abc
 from source.domain.model import Order, OrderDetail, OrderLine, Sku, Shipment, Batch
 from pydantic.dict import Dict
-from .app import sku_list, batch_list
+from . app import sku_list, batch_list
+from uuid import UUID, uuid4
 
 
 # abstartrepository is a port and  fake&sql repository is a adapter
-
+# archive, active , inactive
 
 # class AbstractRepository(abc.ABC):
 #     @abc.abstractmethod
@@ -31,16 +32,15 @@ from .app import sku_list, batch_list
 #         return self.session.query(models.Batch).all()
 
 class AbstractRepository(abc.ABC):
-    def get(self):
+    async def get(self):
         raise NotImplementedError
 
-    def add(self, model):
+    async def add(self, model):
         raise NotImplementedError
 
-    def update(self, model) -> None:
+    async def update(self, model) -> None:
         raise NotImplementedError
 
-    def delete(self, model) -> None:
         raise NotImplementedError
 
 
@@ -115,7 +115,7 @@ class OrderRepository(AbstractRepository):
         await model.append(values)
 
     async def update(self, model: Order) -> None:
-        vlaues = {
+        values = {
             "order_id": model.order_id,
             "customer_id": model.customer_id,
             "item": model.item,

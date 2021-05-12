@@ -70,7 +70,7 @@ async def get_batches(request):
     return json(new_batch)
 
 
-@app.get("/batch/<id:int" >)
+@app.get("/batch/<id:int>")
 async def get_batches_by_id(request, id: int):
     for i in range(len(batch_list)+1):
         try:
