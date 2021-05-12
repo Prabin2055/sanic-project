@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from source.domain.model import Batch, Shipment, Order, Sku, OrderDetail
+from domain.model import Batch, Shipment, Order, Sku, OrderDetail
 from uuid import UUID
 from datetime import date, datetime
 

@@ -11,7 +11,7 @@ and of the latest state.
 
 from __future__ import annotations
 import abc
-from source.adapters import repository
+from adapters import repository
 
 
 class AbstractUnitOfWork(abc.ABC):

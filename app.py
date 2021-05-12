@@ -1,7 +1,13 @@
 from sanic import Sanic
+from sanic import response
 from sanic.response import text, json
-from source.models import Shipment, Order, OrderLine, Sku, Batch
+from domain.model import Shipment, Order, OrderLine, Sku, Batch
 from datetime import date, datetime
+from sanic.response import HTTPResponse
+from service_layer import service, unit_of_work
+from service_layer import abstract
+from pydantic import HttpUrl
+
 
 app = Sanic(__name__)
 
@@ -53,6 +59,24 @@ order_detail_list = [{
 @app.get("/")
 async def hello_world(request):
     return text("hello,  Prabin How are you??")
+
+
+@app.route("/shipment", methods=['GET', 'POST'])
+def add_shipment(request):
+    service.add_shipment(validated_data=abstract.AddShipment(
+        item="laptop",
+        quantity=10,
+        purchase_date="2020-01-02",
+        received_date="2020-01-09",
+        address="kapan",
+        contact="9837484949",
+        sku_id="L-D-B-i7",
+        batch_ref="01"
+
+    ), uow=unit_of_work.ShipmentUnitOfWork)
+    return HTTPResponse("sucessfully added")
+
+
 
 
 @app.get("/batch")

@@ -10,36 +10,37 @@ W2.e make some checks or assertions about the request against the current state 
 4.If all is well, we save/update any state we’ve changed.
 
 """
-from source.service_layer.abstract import AddBatch, AddOrder, AddShipment, AddSku, AddOrderDetail, AddOrderLine, UpdateShipment
+from service_layer.abstract import AddBatch, AddOrder, AddShipment, AddSku, AddOrderDetail, AddOrderLine, UpdateShipment
 from __future__ import annotations
 from typing import Optional
 from datetime import date
 from uuid import UUID
-from source.domain import model
-from source.service_layer import handlers, unit_of_work
-from source.domain import command
-from source.service_layer import abstract
-from source.domain.model import OrderLine, Order, OrderDetail, Sku, Shipment, Batch
-from source.adapters.repository import BatchRepository, OrderRepository, OrderdDetailRepository, OrderLineRepository, SkuRepository, ShipmentRepository
-# from handlers import add_shipment, add_order, add_order_detail, add_sku, add_batch, add_orderline
+from domain import model
+from service_layer import handlers, unit_of_work
+from domain import command
+from service_layer import abstract
+from adapters.repository import BatchRepository, OrderRepository, OrderdDetailRepository, OrderLineRepository, SkuRepository, ShipmentRepository
 
 
 async def add_shipment(
-    validated_data: AddShipment  # call abstract.py
+    # call abstract.py
+    validated_data: abstract.AddShipment, uow: unit_of_work.ShipmentUnitOfWork
 ) -> None:
-    shipment = await handlers.add_shipment(command.AddShipment(
-        item=validated_data.item,
-        quantity=validated_data.quantity,
-        purchase_date=validated_data.purchase_date,
-        received_date=validated_data.received_date,
-        address=validated_data.address,
-        contact=validated_data.contact,
-        sku_id=validated_data.sku_id,
-        batch_ref=validated_data.batch_ref
+    with uow:
+        shipment = await handlers.add_shipment(command.AddShipment(
+            item=validated_data.item,
+            quantity=validated_data.quantity,
+            purchase_date=validated_data.purchase_date,
+            received_date=validated_data.received_date,
+            address=validated_data.address,
+            contact=validated_data.contact,
+            sku_id=validated_data.sku_id,
+            batch_ref=validated_data.batch_ref
 
-    ))
-    repo = ShipmentRepository()
-    repo.add(shipment)
+        ))
+        repo = ShipmentRepository()
+        repo.add(shipment)
+        uow.commit()
 
 
 def update_shipment(id_: UUID, validated_data: abstract.UpdateShipment) -> None:
@@ -220,16 +221,13 @@ def add_order_line(
     repo.add(order_line)  # add repository method eg add
 
 
-
-
-
 # unit of work
 
-def add_batch(
-    sku: str, batch_ref: str, quantity: int, manufacture_date: date, expire_date: date,
-    uow: unit_of_work.BatchUnitOfWork
-):
-    with uow:
-        uow.batch_ref.add(model.Batch(
-            sku, batch_ref, quantity, manufacture_date, expire_date))
-        uow.commit()
+# def add_batch(
+#     sku: str, batch_ref: str, quantity: int, manufacture_date: date, expire_date: date,
+#     uow: unit_of_work.BatchUnitOfWork
+# ):
+#     with uow:
+#         uow.batch_ref.add(model.Batch(
+#             sku, batch_ref, quantity, manufacture_date, expire_date))
+#         uow.commit()

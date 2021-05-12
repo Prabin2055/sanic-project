@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import date, datetime
 from uuid import uuid4, UUID
-from source.domain.model import Shipment, Order, OrderDetail, Sku, Batch, OrderLine
+from domain.model import Shipment, Order, OrderDetail, Sku, Batch, OrderLine
 
 
 class AddShipment(BaseModel):

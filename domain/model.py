@@ -1,11 +1,12 @@
 from pydantic import BaseModel, validator
-from datetime import Optional, date, datetime
+from datetime import date, datetime
 from email import email
 from typing import Optional
 from uuid import UUID
 from pydantic.color import Color
-from pydantic.float import float
-import typing
+from typing import Optional
+from pydantic import Dict
+
 """
 1. product is identified bya a sku
 2. customers place order, order  is identified by an order reference
@@ -69,7 +70,7 @@ def shipment_factory(
     batch_ref: str,
 ) -> Shipment:
     return Shipment(
-        id_=Id_,
+        id_=id_,
         item=item,
         quantity=quantity,
         purchase_date=purchase_date,

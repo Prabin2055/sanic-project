@@ -1,7 +1,7 @@
 import abc
-from source.domain.model import Order, OrderDetail, OrderLine, Sku, Shipment, Batch
-from pydantic.dict import Dict
-from . app import sku_list, batch_list
+from domain.model import Order, OrderDetail, OrderLine, Sku, Shipment, Batch
+from pydantic import Dict
+from app import sku_list, batch_list
 from uuid import UUID, uuid4
 
 
@@ -32,15 +32,20 @@ from uuid import UUID, uuid4
 #         return self.session.query(models.Batch).all()
 
 class AbstractRepository(abc.ABC):
+    @abc.abstractmethod
     async def get(self):
         raise NotImplementedError
 
-    async def add(self, model):
+    @abc.abstractmethod
+    async def add(self, model=None):
         raise NotImplementedError
 
-    async def update(self, model) -> None:
+    @abc.abstractmethod
+    async def update(self, model=None) -> None:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def delete(self, model=None):
         raise NotImplementedError
 
 
@@ -64,7 +69,9 @@ class ShipmentRepository(AbstractRepository):
             "batch_ref": model.batch_ref,
 
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: Shipment) -> None:
         values = {
@@ -88,7 +95,7 @@ class ShipmentRepository(AbstractRepository):
 
 
 class OrderRepository(AbstractRepository):
-    async def get(self, id_: uuid) -> Order:
+    async def get(self, id_: uuid4) -> Order:
         order = {}
         if id_ in order_list[id_]:
             order = order_list[id_]
@@ -112,7 +119,9 @@ class OrderRepository(AbstractRepository):
             "payementId": model.payementId,
             "paid": model.paid,
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: Order) -> None:
         values = {
@@ -166,7 +175,9 @@ class OrderdDetailRepository(AbstractRepository):
             "shipdate": model.shipdate,
             "billdate": model.billdate,
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: OrderDetail) -> None:
         values = {
@@ -206,7 +217,9 @@ class SkuRepository(AbstractRepository):
             "color": model.color,
             "product": model.product,
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: Sku) -> Sku:
         values = {
@@ -239,7 +252,9 @@ class BatchRepository(AbstractRepository):
             "manufacture_date": model.manufacture_date,
             "expire_date": model.expire_date,
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: Batch) -> None:
         values = {
@@ -273,7 +288,9 @@ class OrderLineRepository(AbstractRepository):
             "quantity": model.quantity,
             "order_id": model.order_id
         }
-        await model.append(values)
+        # await model.append(values)
+        with open("file.json", "a+") as f:
+            f.write(f'{values}\n')
 
     async def update(self, model: OrderLine) -> None:
         values = {
