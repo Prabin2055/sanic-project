@@ -1,12 +1,12 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from datetime import date, datetime
-from email import email
 from typing import Optional
 from uuid import UUID
 from pydantic.color import Color
 from typing import Optional
 from pydantic import Dict
-
+from typing import Any
+import typing
 """
 1. product is identified bya a sku
 2. customers place order, order  is identified by an order reference
@@ -57,6 +57,11 @@ class Shipment(BaseModel):
     def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
 
+    def update_item(self, item: str):
+        item_ = self.item
+        self.item = item_
+        return self.copy()
+
 
 def shipment_factory(
     id_: UUID,
@@ -91,7 +96,7 @@ class Order(BaseModel):
     shipperId: UUID
     shipping_address: str
     order_address: str
-    order_email: email
+    order_email: str
     order_date: date
     order_status: bool
     timestamp: datetime
@@ -107,11 +112,6 @@ class Order(BaseModel):
     def update(self, mapping: Dict[str, Any]):
         return self.copy(update=mapping)
 
-    def add_order(self, order: OrderReference):
-        orders = set(self.orders)
-        orders.add(order)
-        return self.copy(update={"orders": tuple(orders)})
-
 
 def order_factory(
     id_: UUID,
@@ -122,7 +122,7 @@ def order_factory(
     shipperId: UUID,
     shipping_address: str,
     order_address: str,
-    order_email: email,
+    order_email: str,
     order_date: date,
     order_status: bool,
     timestamp: datetime,
@@ -161,7 +161,7 @@ class OrderDetail(BaseModel):
     discount: float
     total: float
     shipdate: date
-    billdate: datetime
+    billdate: date
 
     class Config:
         allow_mutation = False
@@ -183,7 +183,7 @@ def order_detail_factory(
     discount: float,
     total: float,
     shipdate: date,
-    billdate: datetime,
+    billdate: date,
 ) -> OrderDetail:
     return OrderDetail(
         id_=id_,
@@ -216,7 +216,7 @@ class Sku(BaseModel):
         title = "Sku"
 
     # better for use typing . typing is a typecasting eg. int to str
-    def update(self, mapping: typing.Dict[str, typing.Any]) -> Sku:
+    def update(self, mapping: typing.Dict[str, typing.Any]):
         return self.copy(update=mapping)
 
 
@@ -244,7 +244,7 @@ class Batch(BaseModel):
      sku,
 
     """
-    id_: uuid4()
+    id_: UUID
     sku: str
     batch_ref: str
     quantity: int

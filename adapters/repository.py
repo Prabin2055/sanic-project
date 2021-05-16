@@ -1,9 +1,13 @@
-import abc
 from domain.model import Order, OrderDetail, OrderLine, Sku, Shipment, Batch
 from pydantic import Dict
 from app import sku_list, batch_list
 from uuid import UUID, uuid4
+from adapters.abstract_repository import AbstractRepository
+import os
+import pickle
 
+database = {}
+i = 0
 
 # abstartrepository is a port and  fake&sql repository is a adapter
 # archive, active , inactive
@@ -18,7 +22,7 @@ from uuid import UUID, uuid4
 #         raise NotImplementedError
 
 
-# class SqlAlchemyRepository(AbstractRepository):
+# class SqlAlchemyRepository(AbstractRepository)
 #     def __init__(self, session):
 #         self.session = session
 
@@ -31,32 +35,15 @@ from uuid import UUID, uuid4
 #     def list(self):
 #         return self.session.query(models.Batch).all()
 
-class AbstractRepository(abc.ABC):
-    @abc.abstractmethod
-    async def get(self):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def add(self, model=None):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def update(self, model=None) -> None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def delete(self, model=None):
-        raise NotImplementedError
-
 
 class ShipmentRepository(AbstractRepository):
-    async def get(self, id_: uuid4) -> Shipment:
-        shipment = {}
-        if id_ in shipment_list[id_]:
-            shipment = shipment_list[id_]
-        return OrderDetail.construct(shipment)
+    async def get(self, id_: UUID) -> Shipment:
+        data = database[id_]
+        print("GET, data", data)
+        shipment_data = Shipment(**data)
+        return shipment_data
 
-    async def add(self, model: Shipment):
+    async def add(self, model: Shipment) -> None:
         values = {
             "id_": model.Id_,
             "item": model.item,
@@ -70,10 +57,14 @@ class ShipmentRepository(AbstractRepository):
 
         }
         # await model.append(values)
-        with open("file.json", "a+") as f:
-            f.write(f'{values}\n')
+        global i
+        i += 1
+        database[i] = values
+        with open('database.pickle', 'wb') as handle:
+            pickle.dump(database, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        print(database)
 
-    async def update(self, model: Shipment) -> None:
+    async def update(self, id_, model: Shipment) -> None:
         values = {
             "id_": model.Id_,
             "item": model.item,
@@ -85,23 +76,22 @@ class ShipmentRepository(AbstractRepository):
             "sku_id": model.sku_id,
             "batch_ref": model.batch_ref
         }
-        for i in range(len(self)+1):
-            if self[i]["id_"] == values.id_:
-                await self[i].update(values)
+        database[id_] = values
+        print(database)
 
-    async def delete(self, model: Shipment) -> None:
+    async def delete(self, id_, model: Shipment) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
 
 class OrderRepository(AbstractRepository):
-    async def get(self, id_: uuid4) -> Order:
-        order = {}
-        if id_ in order_list[id_]:
-            order = order_list[id_]
-        return Order.construct(order)
+    async def get(self, id_: UUID) -> Order:
+        data = database[id_]
+        print("GET, data", data)
+        order_data = Order(**data)
+        return order_data
 
-    async def add(self, model: Order):
+    async def add(self, model: Order) -> None:
         values = {
             "order_id": model.order_id,
             "customer_id": model.customer_id,
@@ -123,7 +113,7 @@ class OrderRepository(AbstractRepository):
         with open("file.json", "a+") as f:
             f.write(f'{values}\n')
 
-    async def update(self, model: Order) -> None:
+    async def update(self, id_, model: Order) -> None:
         values = {
             "order_id": model.order_id,
             "customer_id": model.customer_id,
@@ -142,26 +132,25 @@ class OrderRepository(AbstractRepository):
             "paid": model.paid
 
         }
-        for i in range(len(self)+1):
-            if self[i]["id_"] == values.id_:
-                await self[i].update(values)
+        database[id_] = values
+        print(database)
 
     # async def get(self, customer_id) -> Dict:
     #     return self.query(models.Order).filter_by(customer_id=customer_id).one()
 
-    async def delete(self, model: Shipment) -> None:
+    async def delete(self, id_, model: Shipment) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
 
 class OrderdDetailRepository(AbstractRepository):
     async def get(self, id_: UUID) -> OrderDetail:
-        order_detail = {}
-        if id_ in order_detail_list[id_]:
-            order_detail = order_detail_list[id_]
-        return OrderDetail.construct(order_detail)
+        data = database[id_]
+        print("GET, data", data)
+        order_detail_data = OrderDetail(**data)
+        return order_detail_data
 
-    async def add(self, model: OrderDetail):
+    async def add(self, model: OrderDetail) -> None:
         values = {
             "id_": model.Id_,
             "order_id": model.order_id,
@@ -179,7 +168,7 @@ class OrderdDetailRepository(AbstractRepository):
         with open("file.json", "a+") as f:
             f.write(f'{values}\n')
 
-    async def update(self, model: OrderDetail) -> None:
+    async def update(self, id_, model: OrderDetail) -> None:
         values = {
             "id_": model.Id_,
             "order_id": model.order_id,
@@ -193,23 +182,22 @@ class OrderdDetailRepository(AbstractRepository):
             "shipdate": model.shipdate,
             "billdate": model.billdate,
         }
-        for i in range(len(self)+1):
-            if self[i]["id_"] == values.id_:
-                await self[i].update(values)
+        database[id_] = values
+        print(database)
 
-    async def delete(self, model: OrderDetail) -> None:
+    async def delete(self, id_, model: OrderDetail) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
 
 class SkuRepository(AbstractRepository):
-    async def get(self, sku_id: str) -> Sku:
-        sku = {}
-        if sku_id in sku_list[sku_id]:
-            sku = sku_list[sku_id]
-        return Sku.construct(sku)
+    async def get(self, sku_id: UUID) -> Sku:
+        data = database[sku_id]
+        print("GET, data", data)
+        sku_data = Sku(**data)
+        return sku_data
 
-    async def add(self, model: Sku):
+    async def add(self, model: Sku) -> None:
         values = {
             "sku_id": model.sku_id,
             "brand": model.brand,
@@ -221,7 +209,7 @@ class SkuRepository(AbstractRepository):
         with open("file.json", "a+") as f:
             f.write(f'{values}\n')
 
-    async def update(self, model: Sku) -> Sku:
+    async def update(self, sku_id, model: Sku) -> None:
         values = {
             "sku_id": model.sku_id,
             "brand": model.brand,
@@ -229,19 +217,20 @@ class SkuRepository(AbstractRepository):
             "color": model.color,
             "product": model.product,
         }
-        await model.update(values)
+        database[sku_id] = values
+        print(database)
 
-    async def delete(self, model: Sku) -> None:
+    async def delete(self, sku_id, model: Sku) -> None:
         if self.sku_id in model.sku_id:
             del model[sku_id]
 
 
 class BatchRepository(AbstractRepository):
-    async def get(self, batch_ref: str) -> Batch:
-        batch = {}
-        if batch_ref in batch_list[batch_ref]:
-            batch = batch_list[batch_ref]
-        return Batch.construct(batch)
+    async def get(self, id_: UUID) -> Batch:
+        data = database[id_]
+        print("GET, data", data)
+        batch_data = Batch(**data)
+        return batch_data
 
     async def add(self, model: Batch):
         values = {
@@ -256,7 +245,7 @@ class BatchRepository(AbstractRepository):
         with open("file.json", "a+") as f:
             f.write(f'{values}\n')
 
-    async def update(self, model: Batch) -> None:
+    async def update(self, id_, model: Batch) -> None:
         values = {
             "id_": model.id_,
             "sku": model.sku,
@@ -265,23 +254,22 @@ class BatchRepository(AbstractRepository):
             "manufacture_date": model.manufacture_date,
             "expire_date": model.expire_date,
         }
-        for i in range(len(self)+1):
-            if self[i]["id_"] == values.id_:
-                await self[i].update(values)
+        database[id_] = values
+        print(database)
 
-    async def delete(self, model: Batch) -> None:
+    async def delete(self, id_, model: Batch) -> None:
         if self.id_ in model.id_:
             del model[id_]
 
 
 class OrderLineRepository(AbstractRepository):
     async def get(self, id_: UUID) -> OrderLine:
-        order_line = {}
-        if id_ in order_line_list[id_]:
-            order_line = order_line_list[id_]
-        return OrderLine.construct(order_line)
+        data = database[id_]
+        print("GET, data", data)
+        orderdata = OrderLine(**data)
+        return orderdata
 
-    async def add(self, model: OrderLine):
+    async def add(self, model: OrderLine) -> None:
         values = {
             "id_": model.Id_,
             "sku": model.sku,
@@ -292,17 +280,16 @@ class OrderLineRepository(AbstractRepository):
         with open("file.json", "a+") as f:
             f.write(f'{values}\n')
 
-    async def update(self, model: OrderLine) -> None:
+    async def update(self, id_, model: OrderLine) -> None:
         values = {
             "id_": model.Id_,
             "sku": model.sku,
             "quantity": model.quantity,
             "order_id": model.order_id
         }
-        for i in range(len(self)+1):
-            if self[i]["id_"] == values.id_:
-                await self[i].update(values)
+        database[id_] = values
+        print(database)
 
-    async def delete(self, model: OrderLine) -> None:
+    async def delete(self, id_, model: OrderLine) -> None:
         if self.id_ in model.id_:
             del model[id_]

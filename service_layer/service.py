@@ -10,8 +10,9 @@ W2.e make some checks or assertions about the request against the current state 
 4.If all is well, we save/update any state we’ve changed.
 
 """
-from service_layer.abstract import AddBatch, AddOrder, AddShipment, AddSku, AddOrderDetail, AddOrderLine, UpdateShipment
 from __future__ import annotations
+from os import O_TMPFILE
+from service_layer.abstract import AddBatch, AddOrder, AddShipment, AddSku, AddOrderDetail, AddOrderLine, UpdateShipment
 from typing import Optional
 from datetime import date
 from uuid import UUID
@@ -20,13 +21,13 @@ from service_layer import handlers, unit_of_work
 from domain import command
 from service_layer import abstract
 from adapters.repository import BatchRepository, OrderRepository, OrderdDetailRepository, OrderLineRepository, SkuRepository, ShipmentRepository
-
+import asyncio
 
 async def add_shipment(
     # call abstract.py
     validated_data: abstract.AddShipment, uow: unit_of_work.ShipmentUnitOfWork
 ) -> None:
-    with uow:
+    with uow()as w:
         shipment = await handlers.add_shipment(command.AddShipment(
             item=validated_data.item,
             quantity=validated_data.quantity,
@@ -38,39 +39,46 @@ async def add_shipment(
             batch_ref=validated_data.batch_ref
 
         ))
+        # repo = ShipmentRepository()
+        # repo.add(shipment)
+        # uow.commit()
+        # w.storedata.append(shipment)
+        w.storedata=shipment
+        w.commit()
+
+
+async def update_shipment(id_: UUID, validated_data: abstract.UpdateShipment, uow: unit_of_work.ShipmentUnitOfWork) -> None:
+    with uow:
         repo = ShipmentRepository()
-        repo.add(shipment)
+        shipment = repo.get(id_)
+        # await asyncio.sleep(2)
+        # print("Responce from repo", shipment, type(shipment), validated_data)
+        shipment_data = await asyncio.wait( handlers.update_shipment(command.UpdateShipment(
+            shipment=shipment,
+            item=validated_data.item if validated_data.item else shipment.item,
+            quantity=validated_data.quantity if validated_data.quantity else shipment.quantity,
+            purchase_date=validated_data.purchase_date if validated_data.purchase_date else shipment.purchase_date,
+            received_date=validated_data.received_date if validated_data.received_date else shipment.received_date,
+            address=validated_data.address if validated_data.address else shipment.address,
+            contact=validated_data.contact if validated_data.contact else shipment.contact,
+            sku_id=validated_data.sku_id if validated_data.sku_id else shipment.sku_id,
+            batch_ref=validated_data.batch_ref if validated_data.batch_ref else shipment.batch_ref
+
+        )))
+        repo.update(id_, shipment_data)
         uow.commit()
+    
 
-
-def update_shipment(id_: UUID, validated_data: abstract.UpdateShipment) -> None:
+async def update_shipment_batch(id_: UUID, validated_data: abstract.UpdateShipmentBatch):
     repo = ShipmentRepository()
-    shipment = repo.get(id_)
-    shipment = handlers.update_shipment(command.UpdateShipment(
-        shipment=shipment,
-        item=validated_data.item if validated_data.item else shipment.item,
-        quantity=validated_data.quantity if validated_data.quantity else shipment.quantity,
-        purchase_date=validated_data.purchase_date if validated_data.purchase_date else shipment.purchase_date,
-        received_date=validated_data.received_date if validated_data.received_date else shipment.received_date,
-        address=validated_data.address if validated_data.address else shipment.address,
-        contact=validated_data.contact if validated_data.contact else shipment.contact,
-        sku_id=validated_data.sku_id if validated_data.sku_id else shipment.sku_id,
-        batch_ref=validated_data.batch_ref if validated_data.batch_ref else shipment.batch_ref
-
-    ))
-    repo.update(shipment)
-
-
-def update_shipment_batch(id_: UUID, validated_data: abstract.UpdateShipmentBatch):
-    repo = ShipmentRepository()
-    shipment = repo.get(id_)
+    shipment_ = repo.get(id_)
     shipment = handlers.update_shipment(command.UpdateShipmentBatch(
-        shipment=shipment, batch_ref=validated_data.batch_ref
+        shipment=shipment_, batch_ref=validated_data.batch_ref
     ))
     repo.update(shipment)
 
 
-def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQuantity):
+async def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQuantity):
     repo = ShipmentRepository()
     shipment = repo.get(id_)
     shipment = handlers.update_shipment(command.UpdateShipmentQuantity(
@@ -84,8 +92,7 @@ def update_shipment_quantity(id_: UUID, validated_data: abstract.UpdateShipmentQ
 #     shipment=handlers.delete_shipment(command.ShipmentCommand(validated_data.ShipmentCommand))
 #     repo.delete(shipment)
 
-
-def add_order(
+async def add_order(
     validated_data: AddOrder
 ) -> None:
     order = handlers.add_order(command.AddOrder(
@@ -109,7 +116,7 @@ def add_order(
     repo.add(order)
 
 
-def update_order_item(id_: UUID, validated_data: abstract.UpdateOrderItem):
+async def update_order_item(id_: UUID, validated_data: abstract.UpdateOrderItem):
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderItem(
@@ -118,7 +125,7 @@ def update_order_item(id_: UUID, validated_data: abstract.UpdateOrderItem):
     repo.update(order)
 
 
-def update_order_quantity(id_: UUID, validated_data: abstract.UpdateOrderQuantity):
+async def update_order_quantity(id_: UUID, validated_data: abstract.UpdateOrderQuantity):
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderQuantity(
@@ -127,7 +134,7 @@ def update_order_quantity(id_: UUID, validated_data: abstract.UpdateOrderQuantit
     repo.update(order)
 
 
-def update_order_amount(id_: UUID, validated_data: abstract.UpdateOrderAmount):
+async def update_order_amount(id_: UUID, validated_data: abstract.UpdateOrderAmount):
     repo = OrderRepository()
     order = repo.get(id_)
     order = handlers.update_order(command.UpdateOrderAmount(
@@ -231,3 +238,41 @@ def add_order_line(
 #         uow.batch_ref.add(model.Batch(
 #             sku, batch_ref, quantity, manufacture_date, expire_date))
 #         uow.commit()
+
+
+# def allocate(
+#     orderid: str, sku: str, qty: int,
+#     uow: unit_of_work.AbstractUnitOfWork,
+# ) -> str:
+#     line = OrderLine(orderid, sku, qty)
+#     with uow:
+#         product = uow.products.get(sku=line.sku)
+#         if product is None:
+#             raise InvalidSku(f"Invalid sku {line.sku}")
+#         try:
+#             batchref = product.allocate(line)
+#             uow.commit()
+#             return batchref
+#         except model.OutOfStock:
+#             email.send_mail("stock@made.com", f"Out of stock for {line.sku}")
+#             raise
+
+async def add_shipment(
+    validated_data: abstract.AddShipment,
+    uow: unit_of_work.ShipmentUnitOfWork,
+) -> str:
+    with uow:
+        shipment = await handlers.add_shipment(command.AddShipment(
+            item=validated_data.item,
+            quantity=validated_data.quantity,
+            purchase_date=validated_data.purchase_date,
+            received_date=validated_data.received_date,
+            address=validated_data.address,
+            contact=validated_data.contact,
+            sku_id=validated_data.sku_id,
+            batch_ref=validated_data.batch_ref
+
+        ))
+        repo = ShipmentRepository()
+        repo.add(shipment)
+        uow.commit()

@@ -3,7 +3,7 @@ from datetime import date
 from domain.model import Batch, Shipment, Order, Sku, OrderDetail
 from uuid import UUID
 from datetime import date, datetime
-
+from pydantic.color import Color
 
 class AddShipment(BaseModel):
     item: str
@@ -48,7 +48,7 @@ class AddOrder(BaseModel):
     shipperId: UUID
     shipping_address: str
     order_address: str
-    order_email: email
+    order_email: str
     order_date: date
     order_status: bool
     timestamp: datetime
@@ -83,7 +83,7 @@ class AddOrderDetail(BaseModel):
     discount: float
     total: float
     shipdate: date
-    billdate: datetime
+    billdate: date
 
 
 class OrderDetailCommand(BaseModel):

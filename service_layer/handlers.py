@@ -2,7 +2,7 @@ from domain import command
 from domain import model
 
 
-async def add_shipment(cmd:command.AddShipment) -> model.Shipment:
+async def add_shipment(cmd: command.AddShipment) -> model.Shipment:
     return model.shipment_factory(
         item=cmd.item,
         quantity=cmd.quantity,
@@ -17,11 +17,22 @@ async def add_shipment(cmd:command.AddShipment) -> model.Shipment:
 
 
 async def update_shipment(cmd: command.ShipmentCommand) -> model.Shipment:
-    if isinstance(cmd, command.UpdateShipmentBatch):
+    if isinstance(cmd, command.UpdateShipment):
+        return cmd.shipment.update({
+            'item': cmd.item,
+            'quantity': cmd.quantity,
+            'purchase_date': cmd.purchase_date,
+            'received_date': cmd.received_date,
+            'address': cmd.address,
+            'contact': cmd.contact,
+            'sku_id': cmd.sku_id,
+            'batch_ref': cmd.batch_ref
+        })
+    elif isinstance(cmd, command.UpdateShipmentBatch):
         return cmd.shipment.update({
             'batch_ref': cmd.batch_ref
         })
-    elif isinstance(cmd,command.UpdateShipmentQuantity):
+    elif isinstance(cmd, command.UpdateShipmentQuantity):
         return cmd.shipment.update({
             'quantity': cmd.quantity
         })
@@ -104,11 +115,11 @@ async def update_sku(cmd: command.SkuCommand) -> model.Sku:
 
 async def add_batch(cmd: command.AddBatch) -> model.Batch:
     return model.batch_factory(
-        sku = cmd.sku,
-        batch_ref = cmd.batch_ref,
-        quantity = cmd.quantity,
-        manufacture_date = cmd.manufacture_date,
-        expire_date = cmd.expire_date,
+        sku=cmd.sku,
+        batch_ref=cmd.batch_ref,
+        quantity=cmd.quantity,
+        manufacture_date=cmd.manufacture_date,
+        expire_date=cmd.expire_date,
     )  # pass factory argu
 
 
@@ -119,11 +130,9 @@ async def update_batch(cmd: command.BatchCommand) -> model.Batch:
         })
 
 
-
-
 async def add_order_line(cmd: command.AddOrderLine) -> model.OrderLine:
     return model.orderline_factory(
-        sku = cmd.sku,
-        quantity = cmd.quantity,
-        order_id = cmd.order_id
+        sku=cmd.sku,
+        quantity=cmd.quantity,
+        order_id=cmd.order_id
     )

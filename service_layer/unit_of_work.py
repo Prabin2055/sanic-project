@@ -12,61 +12,96 @@ and of the latest state.
 from __future__ import annotations
 import abc
 from adapters import repository
-
-
-class AbstractUnitOfWork(abc.ABC):
-    # which will give us access to the model repository.
-    # model: repository.AbstractRepository
-
-    def __enter__(self) -> AbstractUnitOfWork:
-        return self
-
-    def __exit__(self, *args):
-        self.rollback()
-
-    # call this method to explicitly commit our work when we are ready.
-    def commit(self):
-        raise NotImplementedError
-
-    def rollback(self):  # we don’t commit, or if we exit the context manager by raising an error, we do a rollback
-        raise NotImplementedError
+from service_layer.abstract_unit_of_work import AbstractUnitOfWork
 
 
 class ShipmentUnitOfWork(AbstractUnitOfWork):
     def __init__(self):
-        self.shipment = repository.ShipmentRepository([])
-        self.committed = False
+        self.repo = repository.ShipmentRepository()
 
-    def __enter__(self) -> ShipmentUnitOfWork:
-        self.shipment = repository.ShipmentRepository()
-        return super().__enter__()
+    def __enter__(self):
+        self.storeData = []
+        return self
 
     def __exit__(self, *args):
-        super().__exit__(*args)
-        self.close()
+        return super().__exit__(*args)
 
     def commit(self):
-        self.committed = True
+        self.repo.add(self.storedata)
 
     def rollback(self):
-        pass
+        self.rollback
+
+
+class UpdateShipmentUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.repo = repository.ShipmentRepository()
+
+    def __enter__(self):
+        self.id_=None
+        self.storeDataUpdate = None
+        return self
+
+    def __exit__(self, *args):
+        return super().__exit__(*args)
+
+    def commit(self):
+        self.repo.update(self.id_, self.storeDataUpdate)
+
+    def rollback(self):
+        self.rollback
+
+
+class OrderUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.order = repository.OrderRepository()
+
+    def __enter__(self):
+        self.storedata = []
+        return self
+
+    def __exit__(self, *args):
+        return super().__exit__(*args)
+
+    def commit(self):
+        self.order.add(self.storedata[0])
+
+    def rollback(self):
+        return super().rollback()
+
+
+class SkuUnitOfWork(AbstractUnitOfWork):
+    def __init__(self):
+        self.sku = repository.SkuRepository()
+
+    def __enter__(self):
+        self.storedata = []
+        return self
+
+    def __exit__(self, *args):
+        return super().__exit__(*args)
+
+    def commit(self):
+        self.sku.add(self.storedata[0])
+
+    def rollback(self):
+        return super().rollback()
 
 
 class BatchUnitOfWork(AbstractUnitOfWork):
     def __init__(self):
-        self.batch_ref = repository.BatchRepository([])
-        self.committed = False
+        self.batch = repository.BatchRepository([])
 
     def __enter__(self):
-        self.batch_ref = repository.BatchRepository()
-        return super().__enter__()
+        self.storedata = []
+        return self
 
     def __exit__(self, *args):
         super().__exit__(*args)
         self.close()
 
     def commit(self):
-        self.committed = True
+        self.batch.add(self.storedata[0])
 
     def rollback(self):
-        pass
+        self.rollback()

@@ -2,7 +2,8 @@ from pydantic import BaseModel
 from datetime import date, datetime
 from uuid import uuid4, UUID
 from domain.model import Shipment, Order, OrderDetail, Sku, Batch, OrderLine
-
+from pydantic.color import Color
+from typing import Optional
 
 class AddShipment(BaseModel):
     item: str
@@ -15,26 +16,22 @@ class AddShipment(BaseModel):
     batch_ref: str
 
 
-class ShipmentAbstract(BaseModel):
-    shipment: Shipment
+class UpdateShipment(BaseModel):
+    item: Optional[str]=None
+    quantity: Optional[int]=None
+    purchase_date: Optional[date]=None
+    received_date: Optional[date]=None
+    address: Optional[str]=None
+    contact: Optional[str]=None
+    sku_id: Optional[str]=None
+    batch_ref: Optional[str]=None
 
 
-class UpdateShipment(ShipmentAbstract):
-    item: str
-    quantity: int
-    purchase_date: date
-    received_date: date
-    address: str
-    contact: str
-    sku_id: str
+class UpdateShipmentBatch(BaseModel):
     batch_ref: str
 
 
-class UpdateShipmentBatch(ShipmentAbstract):
-    batch_ref: str
-
-
-class UpdateShipmentQuantity(ShipmentAbstract):
+class UpdateShipmentQuantity(BaseModel):
     quantity: int
 
 
@@ -47,7 +44,7 @@ class AddOrder(BaseModel):
     shipperId: uuid4
     shipping_address: str
     order_address: str
-    order_email: email
+    order_email: str
     order_date: date
     order_status: bool
     timestamp: datetime
@@ -56,19 +53,15 @@ class AddOrder(BaseModel):
     paid: bool
 
 
-class OrderAbstract(BaseModel):
-    order: Order
-
-
-class UpdateOrderItem(OrderAbstract):
+class UpdateOrderItem(BaseModel):
     item: str
 
 
-class UpdateOrderAmount(OrderAbstract):
+class UpdateOrderAmount(BaseModel):
     amount: float
 
 
-class UpdateOrderQuantity(OrderAbstract):
+class UpdateOrderQuantity(BaseModel):
     quantity: str
 
 
@@ -82,14 +75,11 @@ class AddOrderDetail(BaseModel):
     discount: float
     total: float
     shipdate: date
-    billdate: datetime
+    billdate: date
 
 
-class OrderDetailAbstract(BaseModel):
-    order_detail: OrderDetail
 
-
-class UpdateOrderDetailQuantity(OrderDetailAbstract):
+class UpdateOrderDetailQuantity(BaseModel):
     quantity: int
 
 
@@ -100,11 +90,7 @@ class AddSku(BaseModel):
     product: str
 
 
-class SkuAbstract(BaseModel):
-    sku: Sku
-
-
-class UpdateSkuProduct(SkuAbstract):
+class UpdateSkuProduct(BaseModel):
     product: str
 
 
@@ -122,9 +108,5 @@ class AddOrderLine(BaseModel):
     order_id: str
 
 
-class BatchAbstact(BaseModel):
-    batch: Batch
-
-
-class UpdateBatchQuantity(BatchAbstact):
+class UpdateBatchQuantity(BaseModel):
     quantity: int
